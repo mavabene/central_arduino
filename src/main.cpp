@@ -16,16 +16,19 @@ void setup()
   setupSparkMax();
   setupRadioLink();
   setupSteeringLimiters();
-  setupBrake(); // this will block program if CAN is not initialized
+  setupSteeringControl();
+  //setupBrake(); // this will block program if CAN is not initialized
 }
 
 void loop()
 {
   // update state
   loopSpeedEstimation();
+  runControls();
   vehicleState->speed = getSpeed();
   vehicleState->is_auto = determine_auto();
-  vehicleState->angle = measureAngle();
+  vehicleState->angle = SteeringPot->EngVal;
+  Serial.println(vehicleState->angle);
   updateLimiterStates(vehicleState);
   // actuation
   // if (vehicleState->is_auto)
