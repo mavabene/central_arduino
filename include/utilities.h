@@ -46,6 +46,7 @@ struct Sensor
   float last_measure = 0;
   unsigned long currentMillis = 0;
   unsigned long startMillis = 0;
+  float unit_conv_factor = 1;
 };
 
 struct Actuator
@@ -82,6 +83,15 @@ float SensorInputToUnitsFloat(Sensor *sens)
 
 }
 
+void SensorInputToEngUnitsFloatPtr(Sensor *sens)
+{
+    float Value = max(sens->SensorVal, sens->SensorMin);
+    Value = min(Value, sens->SensorMax);
+
+    sens->EngVal = (Value - sens->SensorMin)/(sens->SensorMax - sens->SensorMin)*(sens->MaxEngVal - sens->MinEngVal)+sens->MinEngVal;
+
+}
+
 int UnitConversion(float before_val, float conversion_factor)
 {
     float val = before_val*conversion_factor;
@@ -102,4 +112,16 @@ void CtrlLoop(PidLoop *loop, Sensor *sens, Actuator *act)
     
 }
 
+void updateSensor(Sensor *sens)
+{
+  float currentMillis = millis();
+
+  sens->SensorVal = analogRead(sens->InputPin);
+  sens->Setpoint = 0; // arbitrary for testing, will equal value at input var mem address
+  SensorInputToEngUnitsFloatPtr(sens);
+  float velocity = getDx(sens->measure_start_time,currentMillis,sens->last_measure,sens->EngVal);
+  sens->Vel = UnitConversion(velocity,sens->unit_conv_factor);
+  sens->start_measure = sens->EngVal;
+  sens->measure_start_time = currentMillis;
+}
 

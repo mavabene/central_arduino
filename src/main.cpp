@@ -16,7 +16,7 @@ void setup()
   setupSparkMax();
   setupRadioLink();
   setupSteeringLimiters();
-  setupSteeringControl(SteeringPot);
+  setupSteeringControl();
   //setupBrake(); // this will block program if CAN is not initialized
 }
 
@@ -66,4 +66,18 @@ void actuate(Actuation *act)
   writeToSteering(act->steering);
   writeToBrake(act->brake);
   writeToThrottle(act->throttle);
+}
+
+void setupSteeringControl()
+{
+  // steering
+    SteeringPot->SensorMin = 350;
+    SteeringPot->SensorMax = 850;
+    SteeringPot->MinEngVal = -45;
+    SteeringPot->MaxEngVal = 45;
+    SteeringPot->InputPin = STEERING_ANGLE_SENSOR;
+    //SteeringPot->InputVarAddress = &steering_command;
+    SteeringPot->dt = 20;
+    SteeringPot->unit_conv_factor = 1000;
+
 }
