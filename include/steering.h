@@ -10,25 +10,15 @@ float measureAngle()
 }
 
 
-void setupSteeringControl()
+void setupSteeringControl(Sensor *sens)
 {
   // steering
-    Sensor *SteeringPot = new Sensor();
-    PidLoop *SteeringPID = new PidLoop();
-    Actuator *SteeringMotor = new Actuator();
-    float angle_dt = 20; // in milliseconds
-    int idxSteeringV = 0;
-    float dSumSteeringV = 0;
-    float dMeanSteeringV = 0;
-    float current_angle = 0;
-    float start_angle = 0;
-    float min_detectable_angle = -45;  // as measureable by encoder
-    float max_detectable_angle = 45;
-    float steering_angular_vel = 0;
-    unsigned long angle_detect_start_time = 0;
-    float last_angle = 0;
-    unsigned long currentMillis = 0;
-    unsigned long startMillis = 0;
-
+    sens->SensorMin = 350;
+    sens->SensorMax = 850;
+    sens->MinEngVal = -45;
+    sens->MaxEngVal = 45;
+    sens->InputPin = STEERING_ANGLE_SENSOR;
+    //SteeringPot->InputVarAddress = &steering_command;
+    sens->dt = 20;
 
 }

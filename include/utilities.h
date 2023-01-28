@@ -32,11 +32,20 @@ struct Sensor
   float SensorMax = 1; // maximum raw output of actuator
   float SensorMin = -1;
   float MaxEngVal = 1; // maximum engineering value we want to detect
-  float MinEngVal = 1;
+  float MinEngVal = -1;
   float Perr = 0; // difference between actual position and desired position
   float Vel = 0;  // speed of actuator correlates to Verr
   float SumErr = 0; // integral error
   float Vff = 0; // Velocity feedforward term
+  int InputPin = A1;
+
+  float dt = 20; // time interval between measurements in milliseconds
+  float current_measure = 0;
+  float start_measure = 0;
+  unsigned long measure_start_time = 0;
+  float last_measure = 0;
+  unsigned long currentMillis = 0;
+  unsigned long startMillis = 0;
 };
 
 struct Actuator

@@ -14,6 +14,8 @@ bool readInProgress = false;
 bool newDataFromPC = false;
 
 VehicleState *vehicleState = new VehicleState();
+Sensor *SteeringPot = new Sensor();
+Actuator *SteeringMotor = new Actuator();
 /**
  * @brief  main setup function
  * @note

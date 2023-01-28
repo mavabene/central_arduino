@@ -16,7 +16,7 @@ void setup()
   setupSparkMax();
   setupRadioLink();
   setupSteeringLimiters();
-  setupSteeringControl();
+  setupSteeringControl(SteeringPot);
   //setupBrake(); // this will block program if CAN is not initialized
 }
 
@@ -24,7 +24,6 @@ void loop()
 {
   // update state
   loopSpeedEstimation();
-  runControls();
   vehicleState->speed = getSpeed();
   vehicleState->is_auto = determine_auto();
   vehicleState->angle = SteeringPot->EngVal;
