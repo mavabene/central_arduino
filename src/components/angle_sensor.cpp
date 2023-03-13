@@ -3,9 +3,11 @@
 #include "pin.h"
 #include "angle_sensor.h"
 
-SteeringAngleSensor::SteeringAngleSensor(int pin)
+SteeringAngleSensor::SteeringAngleSensor(int pin, uint32_t interval)
 {
     this->pin = pin;
+    this->interval = interval; // ms
+    this->prev_reading_time = 0;
 }
 
 Status SteeringAngleSensor::setup()
@@ -23,13 +25,29 @@ Status SteeringAngleSensor::loop()
     {
         return Status::FAILED;
     }
-    
+    if (millis() - this->prev_reading_time < this->interval)
+    {
+        return Status::SUCCESS;
+    } 
+    this->prev_reading_time = millis(); // update last read time 
+
     float sensorValue = analogRead(this->pin);
     float angle = (sensorValue - 0) / (1023 - 0) * (this->RIGHT_ANGLE - this->LEFT_ANGLE) + this->LEFT_ANGLE;
     this->currentAngle = angle;
 
     this->addReading(this->currentAngle);
     this->currentAngularVelocity = this->calcVelocity();
+
+    // Serial.print("sensorValue: ");
+    // Serial.print(sensorValue, 1);
+    // Serial.print("\t");
+    // Serial.print("Current angle: ");
+    // Serial.print(currentAngle, 1);
+    // Serial.print("\t");
+    // Serial.print("Angular Velocity: ");
+    // Serial.print(currentAngularVelocity, 1);
+    // Serial.print("\t");
+    // Serial.println("\t");
 
     return Status::SUCCESS;
 }
@@ -40,6 +58,44 @@ void SteeringAngleSensor::addReading(float reading)
     timestamp_buffer.push(millis());
 }
 
+
+float SteeringAngleSensor::calcVelocity()
+{
+   
+    curr_angle_t = millis();
+    dt = curr_angle_t - prev_angle_t;
+
+    if (dt >= time_gap) {
+    
+        curr_angle = this->currentAngle;
+       
+        if (abs(curr_angle - prev_angle) >= 0.3) {
+            
+            angular_velocity = 0.5 * (angular_velocity + ((curr_angle - prev_angle)*1000/dt)); // convert deg/ms to deg/s  
+            prev_angle = curr_angle;
+            prev_angle_t = curr_angle_t;
+        }
+        else{
+            angular_velocity = 0.5 * angular_velocity;
+            if (abs(angular_velocity < 1)) {
+                angular_velocity = 0;
+            }
+        }
+        
+        
+        Serial.print("Angular Velocity: ");
+        Serial.print(currentAngularVelocity, 2);
+        Serial.print("\t");
+        Serial.print("curr_angle: ");
+        Serial.print(curr_angle, 1);
+        Serial.println("\t");
+    }
+    
+    return angular_velocity;
+
+}
+
+/*
 float SteeringAngleSensor::calcVelocity()
 {
     if (reading_buffer.size() != STEERING_ANGLE_BUFFER_LEN || timestamp_buffer.size() != STEERING_ANGLE_BUFFER_LEN) {
@@ -64,14 +120,27 @@ float SteeringAngleSensor::calcVelocity()
         float curr_reading = reading_buffer[curr_index];
         float next_reading = reading_buffer[next_index];
 
-        float velocity = next_reading - curr_reading;
-        total += velocity;
+        uint32_t curr_time = timestamp_buffer[curr_index];
+        uint32_t next_time = timestamp_buffer[next_index];
+
+        float displacement = next_reading - curr_reading;
+        uint32_t time_diff = next_time - curr_time;
+        float curr_velocity = (displacement / time_diff)*1000; //convert deg/ms to deg/sec
+        total += curr_velocity;
+
+        Serial.print("displacement: ");
+        Serial.print(displacement, 1);
+        Serial.print("\t");
+        Serial.print("dt: ");
+        Serial.print(time_diff, 1);
+        Serial.println("\t");
     }
 
     float avg_velocity = total / STEERING_ANGLE_BUFFER_LEN;
 
     return avg_velocity;
 }
+*/
 
 Status SteeringAngleSensor::cleanup()
 {
@@ -86,3 +155,9 @@ float SteeringAngleSensor::getAngularVelocity()
 {
     return this->currentAngularVelocity;
 }
+
+// void SteeringAngleSensor::test(float reading)
+// {
+//     Serial.print(reading, 1);
+//     Serial.println("\t");
+// }

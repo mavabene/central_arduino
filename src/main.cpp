@@ -10,29 +10,30 @@ void setup()
 
 void loop()
 {
-  synchronizeModules(); 
+  // synchronizeModules(); 
   module_manager->loop();
-  actuation_module->actuate(vehicle_state);
+  // actuation_module->actuate(vehicle_state);
+  
 }
 
 void setupModules()
 {
   module_manager = new ModuleManager();
   
-  led_module = new LEDModule(LED_BUILTIN, 500);
-  module_manager->setupModule(led_module);
+  // led_module = new LEDModule(LED_BUILTIN, 500);
+  // module_manager->setupModule(led_module);
 
-  steering_angle_sensor = new SteeringAngleSensor(STEERING_ANGLE_SENSOR);
+  steering_angle_sensor = new SteeringAngleSensor(STEERING_ANGLE_SENSOR, 5);
   module_manager->setupModule(steering_angle_sensor);
 
-  pwm_to_voltage_converter = new PWMVoltageConverterModule(THROTTLE_OUTPUT_PIN);
-  module_manager->setupModule(pwm_to_voltage_converter);
+  // pwm_to_voltage_converter = new PWMVoltageConverterModule(THROTTLE_OUTPUT_PIN);
+  // module_manager->setupModule(pwm_to_voltage_converter);
 
-  radio_link = new RadioLinkModule(THROTTLE_SOURCE, STEERING_SOURCE, BRAKE_SOURCE, BUTTON_SOURCE);
-  module_manager->setupModule(radio_link);
+  // radio_link = new RadioLinkModule(THROTTLE_SOURCE, STEERING_SOURCE, BRAKE_SOURCE, BUTTON_SOURCE);
+  // module_manager->setupModule(radio_link);
 
-  steering_limiter = new SteeringLimiter(STEERING_LEFT_LIMITER, STEERING_RIGHT_LIMITER);
-  module_manager->setupModule(steering_limiter);
+  // steering_limiter = new SteeringLimiter(STEERING_LEFT_LIMITER, STEERING_RIGHT_LIMITER);
+  // module_manager->setupModule(steering_limiter);
 
   spark_max_module = new SparkMaxModule(STEERING_OUTPUT_PIN);
   module_manager->setupModule(spark_max_module);
