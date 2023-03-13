@@ -32,7 +32,7 @@ public:
      *
      * @param pin Pin number for the sensor.
      */
-    SteeringAngleSensor(int pin);
+    SteeringAngleSensor(int pin, uint32_t interval);
 
     /**
      * @brief Sets up the sensor
@@ -113,7 +113,30 @@ private:
      * @note if there is < STEERING_ANGLE_BUFFER_LEN data in the buffer, this function will return 0
      * 
      */
+    float calcVelocity2();
+
+    uint32_t dt = 0;
+    uint32_t time_gap = 20;
+    uint32_t prev_angle_t = 0;
+    uint32_t curr_angle_t = 0;
+    float prev_angle = 0.0;
+    float curr_angle = 0.0;
+    float angular_velocity = 0.0;
+
+
+    /**
+     * @brief calculates the angular velocity
+     * @note if there is < STEERING_ANGLE_BUFFER_LEN data in the buffer, this function will return 0
+     * 
+     */
     float calcVelocity();
     CircularBuffer<float, STEERING_ANGLE_BUFFER_LEN> reading_buffer;
     CircularBuffer<uint32_t, STEERING_ANGLE_BUFFER_LEN> timestamp_buffer;
+
+    uint32_t interval;
+    uint32_t prev_reading_time = 0;
+    uint32_t curr_reading_time = 0;
+    float prev_pos = 0.0;
+    float curr_pos = 0.0;
+
 };
