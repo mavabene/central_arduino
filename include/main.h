@@ -13,6 +13,7 @@
 #include "spark_max.h"
 #include "actuator.h"
 #include "SerialCommunications.h"
+// #include "controls.h"
 
 VehicleState *vehicle_state;
 
@@ -52,3 +53,5 @@ void setupModules();
  * @note this function should run BEFORE moduleManager.loop()
  */
 void synchronizeModules();
+
+void getCtrl();

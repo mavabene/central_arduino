@@ -13,6 +13,7 @@ void loop()
   // synchronizeModules(); 
   module_manager->loop();
   // actuation_module->actuate(vehicle_state);
+  // getCtrl();
   
 }
 
@@ -47,9 +48,12 @@ void setupModules()
 
 void synchronizeModules()
 {
+    Serial.print("angle: ");
+    Serial.print(vehicle_state->angle, 2);
+    Serial.println("\t");
   // get data from angle sensor, steering limiter and update vehicle state
   vehicle_state->angle = steering_angle_sensor->getSteeringAngle();
-  // vehicle_state->angular_velocity = steering_angle_sensor->getAngularVelocity();
+  vehicle_state->angular_velocity = steering_angle_sensor->getAngularVelocity();
   vehicle_state->is_left_limiter_ON = steering_limiter->isLeftLimiterON();
   vehicle_state->is_right_limiter_ON = steering_limiter->isRightLimiterON();
 
@@ -65,6 +69,39 @@ void synchronizeModules()
     vehicle_state->current_actuation->steering = radio_link->getSteering();
   }
 
+    Serial.print("sync mod angle: ");
+    Serial.print(vehicle_state->angle, 2);
+    Serial.println("\t");
+  // vehicle_state->current_actuation->steering = getCtrl(vehicle_state->current_actuation->steering_des, vehicle_state->angle, vehicle_state->angular_velocity, 0);
+
   serial_communicator->setVehicleState(vehicle_state);
   
+}
+
+void getCtrl()
+{
+    float ctrlOutput;
+    float Kp = 8;
+    float Kd = 1;
+    float Ki = 0;
+    // float pos_err = vehicle_state->current_actuation->steering_des - vehicle_state->angle;
+    float pos_err = 0.0 - vehicle_state->angle;
+    
+    float vel = vehicle_state->angular_velocity;
+    float err_sum = 0;
+    // pos_err = setpoint - pos;
+    ctrlOutput = Kp * pos_err - Kd * vel - Ki * err_sum;
+    //ctrlOutput = std::clamp(ctrlOutput, -1, 1);
+    vehicle_state->current_actuation->steering = ctrlOutput;
+
+    // Serial.print("angle: ");
+    // Serial.print(vehicle_state->angle, 2);
+    // Serial.print("\t");
+    // Serial.print("pos_err: ");
+    // Serial.print(pos_err, 2);
+    // Serial.print("\t");
+    Serial.print("Calc Output: ");
+    Serial.print(ctrlOutput, 2);
+    Serial.println("\t");
+
 }

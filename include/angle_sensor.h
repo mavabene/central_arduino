@@ -82,6 +82,24 @@ public:
      */
     float getAngularVelocity();
 
+    /**
+     * @brief Gets the current control.
+     *
+     * This function returns control output.
+     *
+     * @return The current control.
+     */
+    float getCtrl();
+
+    /**
+     * @brief convert deg to rad
+     *
+     * This function converts deg to radian
+     *
+     * @return value in rad.
+     */
+    float DegToRad(float deg);
+    
 private:
     /**
      * @brief The current steering angle

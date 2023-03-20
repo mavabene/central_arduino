@@ -38,16 +38,20 @@ Status SteeringAngleSensor::loop()
     this->addReading(this->currentAngle);
     this->currentAngularVelocity = this->calcVelocity();
 
+    float ctrlOut = getCtrl();
+
     // Serial.print("sensorValue: ");
     // Serial.print(sensorValue, 1);
     // Serial.print("\t");
-    // Serial.print("Current angle: ");
-    // Serial.print(currentAngle, 1);
-    // Serial.print("\t");
-    // Serial.print("Angular Velocity: ");
-    // Serial.print(currentAngularVelocity, 1);
-    // Serial.print("\t");
-    // Serial.println("\t");
+    Serial.print("Current angle: ");
+    Serial.print(currentAngle, 1);
+    Serial.print("\t");
+    Serial.print("Angular Velocity: ");
+    Serial.print(currentAngularVelocity, 1);
+    Serial.print("\t");
+    Serial.print("Calc Output: ");
+    Serial.print(ctrlOut, 2);
+    Serial.println("\t");
 
     return Status::SUCCESS;
 }
@@ -83,17 +87,52 @@ float SteeringAngleSensor::calcVelocity()
         }
         
         
-        Serial.print("Angular Velocity: ");
-        Serial.print(currentAngularVelocity, 2);
-        Serial.print("\t");
-        Serial.print("curr_angle: ");
-        Serial.print(curr_angle, 1);
-        Serial.println("\t");
+        // Serial.print("Angular Velocity: ");
+        // Serial.print(currentAngularVelocity, 2);
+        // Serial.print("\t");
+        // Serial.print("curr_angle: ");
+        // Serial.print(curr_angle, 1);
+        // Serial.println("\t");
     }
     
     return angular_velocity;
 
 }
+
+    float SteeringAngleSensor::getCtrl()
+    {
+        float ctrlOutput;
+        float Kp = 4;
+        float Kd = 1;
+        float Ki = 0;
+        float pos = DegToRad(this->curr_angle);
+        float setpoint = 0.0; // convert setpoint to deg for calc
+        // float pos_err = vehicle_state->current_actuation->steering_des - vehicle_state->angle;
+        float pos_err = setpoint - pos; 
+        
+        float vel = this->angular_velocity;
+        float err_sum = 0;
+        // pos_err = setpoint - pos;
+        ctrlOutput = Kp * pos_err - Kd * DegToRad(vel) - Ki * err_sum;
+        ctrlOutput = constrain(ctrlOutput, -1, 1);
+        // vehicle_state->current_actuation->steering = ctrlOutput;
+
+        // Serial.print("angle: ");
+        // Serial.print(vehicle_state->angle, 2);
+        // Serial.print("\t");
+        // Serial.print("pos_err: ");
+        // Serial.print(pos_err, 2);
+        // Serial.print("\t");
+        
+        return ctrlOutput;
+
+    }
+
+    float SteeringAngleSensor::DegToRad(float deg)
+        {
+            float rad = deg * (22/7)/180;
+            return rad;
+        }
 
 /*
 float SteeringAngleSensor::calcVelocity()

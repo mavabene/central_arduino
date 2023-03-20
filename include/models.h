@@ -13,8 +13,10 @@ However, struct and class are very similar in C++, the only real difference is t
 */
 struct Actuation
 {
-    float throttle = 0.0f;
-    float steering = 0.0f;
+    float throttle = 0.0f; // -1 to 1 value 
+    float steering = 0.0f; // desired pos in radians
+    float steering_des = 0.0f; // desired steering pos from higher level
+    float steering_cmd = 0.0f; // command to motor
     float brake = 0.0f;
     bool reverse = false;
 };
